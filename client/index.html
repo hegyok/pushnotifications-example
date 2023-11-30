@@ -1,0 +1,69 @@
+<html>
+  <head>
+    <link href="manifest.json" rel="manifest" />
+  </head>
+  <body>
+    <button onclick="askPerms()">ASK FOR PERMS</button>
+    <button onclick="fetch('/createAlert')"">SEND NOTIFICATION</button>
+    <script>
+      //registrace workeru
+     async function regWorker () {
+      //veřejný klíč
+      const publicKey = "BKhBkYXCobj-B8mNAUR76ByQgoeL3ZE4UiDUKGe0Rp0ZXqHUrxD8InCrC8efDmBSIZWzvEvHt9VrKsAh2BHyMYg";
+
+      //registrace workeru
+      navigator.serviceWorker.register("3-sw.js", { scope: "/" });
+
+      navigator.serviceWorker.ready
+      .then(reg => {
+        reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: publicKey
+        }).then(
+          //odebírej na push server
+          sub => {
+            fetch("/subscribe", {
+              method: "POST",
+              body: JSON.stringify(sub),
+              headers: { "content-type": "application/json" }
+            })
+            .then(res => res.text())
+            .then(txt => alert(txt))
+            .catch(err => alert(err));
+          },
+
+          // error
+          err => alert(err)
+        );
+      });
+    }
+
+    // získej práva pro push notifikace
+    function askPerms() {
+      document.write("[*] Načteno <br>")
+      // zeptej se na práva
+      if (Notification.permission === "default") {
+        document.write("[*] Žádám o práva <br>")
+        Notification.requestPermission().then(perm => {
+          if (Notification.permission === "granted") {
+            document.write("[*] Práva povolena <br>")
+            regWorker().catch(err => alert(err));
+          } else {
+            alert("Please allow notifications.");
+          }
+        }).catch(e => {
+          document.write(e)
+        })
+      }
+
+      // povoleno
+      else if (Notification.permission === "granted") {
+        regWorker().catch(err => console.error(err));
+      }
+
+      // zakázáno
+      else { alert("Please allow notifications."); }
+    };
+    </script>
+  </body>
+</html>
