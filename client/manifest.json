@@ -1,0 +1,7 @@
+{
+    "name": "pwa-ios-test",
+    "short_name": "pwa-ios-test",
+    "description": "pwa-ios-test",
+    "display": "standalone",
+    "theme_color": "#ffffff"
+}
